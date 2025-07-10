@@ -1,18 +1,24 @@
 package com.metaphorce.shopAll.entidades;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "peliculas")
 public class Pelicula {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id; // Clave primaria que se genera automaticamente
+
+    @NotBlank(message = "El nombre no puede estar vacio")
+    @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
     private String nombre;
+
     private boolean disponible;
 
     // Constructores
-
     public Pelicula() {
     }
 

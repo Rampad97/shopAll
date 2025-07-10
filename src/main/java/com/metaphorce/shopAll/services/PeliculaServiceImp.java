@@ -1,6 +1,7 @@
 package com.metaphorce.shopAll.services;
 
 import com.metaphorce.shopAll.entidades.Pelicula;
+import com.metaphorce.shopAll.exceptions.PeliculaNotFoundException;
 import com.metaphorce.shopAll.repositories.PeliculaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class PeliculaServiceImp implements PeliculaService{
     // Obtener peliculas disponibles
     @Override
     public List<Pelicula> getDisponibles() {
+
         return peliculaRepository.findByDisponible(true);
     }
 
@@ -32,13 +34,17 @@ public class PeliculaServiceImp implements PeliculaService{
     }
 
     // Agregar pelicula
-    public Pelicula agregarPelicula(Pelicula pelicula) {
+    @Override
+    public Pelicula addPelicula(Pelicula pelicula) {
         return peliculaRepository.save(pelicula);
     }
 
     // Eliminar pelicula
     @Override
     public void deletePelicula(Integer id) {
+        if (!peliculaRepository.existsById(id)) {
+            throw new PeliculaNotFoundException("No se puede eliminar. Pelicula con ID " + id + " no encontrada.");
+        }
         peliculaRepository.deleteById(id);
     }
 
@@ -47,11 +53,13 @@ public class PeliculaServiceImp implements PeliculaService{
     public Pelicula marcaDisponible(Integer id) {
         // Optional puede contener el objeto o estar vacio
         Optional<Pelicula> peli = peliculaRepository.findById(id);
+
         if (peli.isPresent()) { // Verifica si el Optional contiene algo
             Pelicula p = peli.get(); // Obtiene el objeto Pelicula del Optional
             p.setDisponible(true); // Marca el estado como disponible
             return peliculaRepository.save(p); // Guarda cambios
+        } else {
+            throw new PeliculaNotFoundException("Pelicula con ID " + id + " no encontrada.");
         }
-        return null; // Si no se encuentra la película devuelve null
     }
 }

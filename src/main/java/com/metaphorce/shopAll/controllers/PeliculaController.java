@@ -2,6 +2,7 @@ package com.metaphorce.shopAll.controllers;
 
 import com.metaphorce.shopAll.entidades.Pelicula;
 import com.metaphorce.shopAll.services.PeliculaService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,39 +11,57 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/shopall")
+@RequestMapping("/api/shopall")
 public class PeliculaController {
     @Autowired
     PeliculaService peliculaService;
 
     @GetMapping("/peliculas")
-    public ResponseEntity<List<Pelicula>> getPeliculas() {
+    public ResponseEntity<?> getPeliculas() {
         List<Pelicula> peliculas = peliculaService.getAllPeliculas();
+
+        if (peliculas.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body("No hay peliculas registradas");
+        }
         return ResponseEntity.ok(peliculas);
     }
 
     @GetMapping("/disponibles")
-    public List<Pelicula> getDisponibles() {
-        return peliculaService.getDisponibles();
+    public ResponseEntity<?> getDisponibles() {
+        List<Pelicula> disponibles = peliculaService.getDisponibles();
+
+        if (disponibles.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body("No hay peliculas disponibles");
+        }
+        return ResponseEntity.ok(disponibles);
     }
 
     @GetMapping("/no-disponibles")
-    public List<Pelicula> getNoDisponibles() {
-        return peliculaService.getNoDisponibles();
+    public ResponseEntity<?> getNoDisponibles() {
+        List<Pelicula> noDisponibles = peliculaService.getNoDisponibles();
+
+        if (noDisponibles.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body("No hay peliculas no disponibles registrads.");
+        }
+        return ResponseEntity.ok(noDisponibles);
     }
 
     @PostMapping
-    public Pelicula postPeli(@RequestBody Pelicula pelicula) {
-        return peliculaService.agregarPelicula(pelicula);
+    public ResponseEntity<String> postPeli(@Valid @RequestBody Pelicula pelicula) {
+        Pelicula peli = peliculaService.addPelicula(pelicula);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Se agrego la pelicua \"" + pelicula.getNombre() + "\" correctamente.");
     }
 
     @DeleteMapping("/{id}")
-    public void deletePeli(@PathVariable Integer id) {
+    public ResponseEntity<String> deletePeli(@PathVariable Integer id) {
         peliculaService.deletePelicula(id);
+        return ResponseEntity.ok("Se elimino la pelicua exitosamente");
     }
 
     @PutMapping("/{id}/disponible")
-    public Pelicula putMarcarDisponible(@PathVariable Integer id) {
-        return  peliculaService.marcaDisponible(id);
+    public ResponseEntity<String> putMarcarDisponible(@PathVariable Integer id) {
+        Pelicula actualizada = peliculaService.marcaDisponible(id);
+        return ResponseEntity.ok("La pelicula \"" + actualizada.getNombre() + "\" ahora esta disponible");
     }
 }

@@ -8,8 +8,7 @@ public interface PeliculaService {
     List<Pelicula> getAllPeliculas();
     List<Pelicula> getDisponibles();
     List<Pelicula> getNoDisponibles();
-    Pelicula agregarPelicula(Pelicula pelicula);
+    Pelicula addPelicula(Pelicula pelicula);
     void deletePelicula(Integer id);
     Pelicula marcaDisponible(Integer id);
-
 }
